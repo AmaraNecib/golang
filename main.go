@@ -1,50 +1,13 @@
 package main
 
-import (
-        "encoding/json"
-		        "fmt"
-				        "log"
-						        "net/http"
-								)
+import "github.com/gofiber/fiber/v2"
 
-								// The `json:"whatever"` bit is a way to tell the JSON
-								// encoder and decoder to use those names instead of the
-								// capitalised names
-								type person struct {
-								        Name string `json:"name"`
-										        Age  int    `json:"age"`
-												}
+func main() {
+	app := fiber.New()
 
-												var tom *person = &person{
-												        Name: "Tom",
-														        Age:  28,
-																}
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
 
-																func tomHandler(w http.ResponseWriter, r *http.Request) {
-
-																        switch r.Method {
-																		        case "GET":
-																				                // Just send out the JSON version of 'tom'
-																								                j, _ := json.Marshal(tom)
-																												                w.Write(j)
-																																        case "POST":
-																																		                // Decode the JSON in the body and overwrite 'tom' with it
-																																						                d := json.NewDecoder(r.Body)
-																																										                p := &person{}
-																																														                err := d.Decode(p)
-																																																		                if err != nil {
-																																																						                        http.Error(w, err.Error(), http.StatusInternalServerError)
-																																																												                }
-																																																																                tom = p
-																																																																				        default:
-																																																																						                w.WriteHeader(http.StatusMethodNotAllowed)
-																																																																										                fmt.Fprintf(w, "I can't do that.")
-																																																																														        }
-																																																																																}
-
-																																																																																func main() {
-																																																																																        http.HandleFunc("/tom", tomHandler)
-
-																																																																																		        log.Println("Go!")
-																																																																																				        http.ListenAndServe(":8080", nil)
-																																																																																}
+	app.Listen(":3000")
+}
